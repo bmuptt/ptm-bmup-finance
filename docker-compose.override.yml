@@ -1,0 +1,9 @@
+services:
+  ptm_bmup_finance:
+    restart: "no"
+
+  ptm_bmup_finance_db:
+    restart: "no"
+
+  ptm_bmup_finance_nginx:
+    restart: "no"

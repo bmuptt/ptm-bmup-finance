@@ -1,0 +1,3 @@
+export const FINANCE_CONSTANTS = {
+  DEFAULT_IURAN_AMOUNT: 10000,
+};

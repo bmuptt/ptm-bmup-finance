@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model CashBalance {
+  balance Decimal @id @db.Decimal(18, 2)
+
+  @@map("cash_balance")
+}
+
+model HistoryBalance {
+  id          Int      @id @default(autoincrement())
+  status      Boolean  @default(false)
+  value       Decimal  @db.Decimal(18, 2)
+  description String
+  created_by  Int
+  created_at  DateTime @default(now())
+
+  @@map("history_balances")
+}
+
+model MembershipDues {
+  id               Int      @id @default(autoincrement())
+  member_id        Int
+  period_year      Int
+  period_month     Int
+  amount           Decimal  @db.Decimal(18, 2)
+  paid_at          DateTime
+  proof_file_path  String?
+  note             String?
+  created_by       Int
+  created_at       DateTime @default(now())
+  updated_by       Int?
+  updated_at       DateTime @updatedAt
+
+  @@unique([member_id, period_year, period_month])
+  @@index([member_id, period_year, period_month])
+  @@map("membership_dues")
+}

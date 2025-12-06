@@ -1,0 +1,43 @@
+- jangan running aplikasi karena saya udah run aplikasinya, cukup run integration testnya, kalau ada error di fix
+- pattern saya lebih baik banyak file yang penting spesifik dan gampang untuk di maintance dan di debug
+- kalau service list pakai paging tolong harus ada sort by id desc agar misal di halaman pertama ada data a nanti di halaman kedua data a tidak muncul lagi
+- hindari pakai tipe data any sebisa mungkin
+- untuk interface pisahkan dan masukan di folder src\model
+- buat integration test untuk test flow saja jika ada perubahan, jalankan testnya, kalau ada error di fix
+- tolong di cek apakah file yang di rubah punya integration test? bisakah perubahan filenya di integration test (misal migration dan model saja yang berubah kan tidak bisa)?kalau belum dan bisa tolong dibuat integration testnya agar memastikan script berjalan lancar
+- kalau mau buat insert data ke table untuk test jangan dari command, pakai aja file testnya input dengan service store dulu, atau langsung create ke tablenya
+- jalankan test yang diperlukan saja agar tidak lama
+- tiap test case (it) harus refresh database biar terisolasi
+- jangan buat test manual, running saja integration test yang ada
+- pada integration test kalau ada call service external di mock aja
+- di docs, curl tidak usah pakai cookie, biar saya handle di postman saja
+- kalau di service update yang ada upload filenya harusnya ada request body status_file. jadi misal status_file nya 0 berati tidak ada perubahan file. kalau status_filenya 1 dan ada upload file berati ada pergantian flie dan kalau status_filenya 1 tapi ga ada upload file berati di hapus filenya
+- kalau ada perubahan selalu cek docs harus yang relavan ya
+- disini semua microservice code error validation pakainya 400
+- saya mau bentuk error validation seperti ini contohnya
+{
+    "errors": [
+        "The email is required!",
+        "The name is required!",
+        "The role is required!"
+    ]
+}
+- hindari penggunaan console karena bikin cepat penuh log dockernya. Dan kita sudah ada apm kibana jadi bisa liat log dari sana
+- rata rata patternnya: route, middleware, validation, controller, service, repository
+- field di db untuk spasi gunakan _ daripada huruf besar. misal created_at
+- jangan asal membuat file md. karena repository saya sifatnya public dan takutnya ada informasi sensitif yang di share, kecuali untuk file dokumentasi api tidak apa apa
+- isi file .env sama seperti di env.example
+- basic command test: npm run test:local
+
+folder:
+- src\config: untuk semua config
+- src\controllers: untuk controllers
+- src\helper: untuk helper
+- src\model: untuk interface
+- src\repository: untuk yang berhubungan dengan query atau call service lain
+- src\routes: untuk routing, permodule pisahkan file routing dengan file lain misal untuk route user dan role beda file
+- src\services: untuk service
+- src\types: untuk types
+- src\validation: untuk validation
+- storage: untuk menyimpan file upload
+- docs: untuk buat file contoh curl. tidak perlu pakai header cookie

@@ -1,0 +1,40 @@
+### PTM BMUP Setting API Test
+
+### Health Check
+GET http://localhost:3000/health
+
+### Root Endpoint
+GET http://localhost:3000/
+
+### Get All Items
+GET http://localhost:3000/api/example
+
+### Get Service Info
+GET http://localhost:3000/api/example/info
+
+### Get Item by ID
+GET http://localhost:3000/api/example/1
+
+### Create New Item
+POST http://localhost:3000/api/example
+Content-Type: application/json
+
+{
+  "name": "Test Item",
+  "description": "This is a test item created via API"
+}
+
+### Update Item
+PUT http://localhost:3000/api/example/1
+Content-Type: application/json
+
+{
+  "name": "Updated Test Item",
+  "description": "This item has been updated via API"
+}
+
+### Delete Item
+DELETE http://localhost:3000/api/example/1
+
+### Test Rate Limiting (run this multiple times quickly)
+GET http://localhost:3000/api/example
