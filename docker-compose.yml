@@ -15,6 +15,7 @@ services:
       - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
       - APM_SERVER_URL=${APM_SERVER_URL_DOCKER}
       - APM_API_KEY_FINANCE=${APM_API_KEY_FINANCE}
+      - APP_APM_ACTIVE=${APP_APM_ACTIVE}
       - TZ=Asia/Jakarta
       - API_URL_CORE=${API_URL_CORE_DOCKER}
       - API_URL_SETTING=${API_URL_SETTING_DOCKER}
@@ -61,4 +62,4 @@ networks:
     driver: bridge
   global_backend_network:
     external: true
-
+

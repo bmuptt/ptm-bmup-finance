@@ -29,6 +29,7 @@ export const config = {
   // APM Configuration
   APM_API_KEY_FINANCE: process.env.APM_API_KEY_FINANCE || '',
   APM_SERVER_URL: process.env.APM_SERVER_URL || 'http://localhost:8200',
+  APP_APM_ACTIVE: process.env.APP_APM_ACTIVE === 'true',
 };
 
 // Validate required environment variables
@@ -39,4 +40,4 @@ for (const envVar of requiredEnvVars) {
     console.warn(`Warning: ${envVar} is not set in environment variables`);
   }
 }
-
+
