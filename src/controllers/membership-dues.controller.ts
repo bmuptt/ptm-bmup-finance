@@ -4,6 +4,7 @@ import { ResponseError } from '../config/response-error';
 import { config } from '../config/environment';
 import { PayDuesRequest } from '../model/membership-dues.model';
 import { deleteFile } from '../utils/file.util';
+import { ImportDuesResult } from '../model/import-dues.model';
 
 class MembershipDuesController {
   async updateStatus(req: Request, res: Response, next: NextFunction) {
@@ -16,6 +17,34 @@ class MembershipDuesController {
         data: { amount: result.amount },
       });
     } catch (e) {
+      next(e);
+    }
+  }
+
+  async importExcel(req: Request, res: Response, next: NextFunction) {
+    try {
+      const period_year = Number(req.body.period_year);
+
+      let token: string | undefined = undefined;
+      if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
+      } else if (req.headers.authorization) {
+        const auth = String(req.headers.authorization);
+        token = auth.replace(/^Bearer\s+/i, '');
+      }
+
+      const result: ImportDuesResult = await membershipDuesService.importFromExcel(req.file!.path, period_year, req.user!.id, token);
+
+      deleteFile(req.file!.path);
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (e) {
+      if (req.file) {
+        deleteFile(req.file!.path);
+      }
       next(e);
     }
   }
@@ -62,7 +91,8 @@ class MembershipDuesController {
       if (req.cookies && req.cookies.token) {
         token = req.cookies.token;
       } else if (req.headers.authorization) {
-        token = req.headers.authorization;
+        const auth = String(req.headers.authorization);
+        token = auth.replace(/^Bearer\s+/i, '');
       }
 
       const result = await membershipDuesService.getList({
@@ -89,7 +119,8 @@ class MembershipDuesController {
       if (req.cookies && req.cookies.token) {
         token = req.cookies.token;
       } else if (req.headers.authorization) {
-        token = req.headers.authorization;
+        const auth = String(req.headers.authorization);
+        token = auth.replace(/^Bearer\s+/i, '');
       }
 
       const result = await membershipDuesService.getDetailById(id, token);

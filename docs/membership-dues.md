@@ -232,3 +232,92 @@ Contoh curl (tanpa cookie header):
 ```bash
 curl -X GET "http://localhost:3300/api/finance/dues/1"
 ```
+
+---
+
+# POST Import Membership Dues (Excel)
+
+Impor data iuran anggota tahunan dari file Excel berdasarkan template export yang sama.
+
+- Method: `POST`
+- URL: `/api/finance/dues/import`
+- Auth required: YES
+- Content-Type: `multipart/form-data`
+
+Form Fields:
+
+- `file` (file, required) → File Excel (`.xlsx` atau `.xls`)
+- `period_year` (number, required) → Tahun periode (2000–2100)
+
+Template Excel (kolom wajib):
+
+- `Member ID`, `Member Name`, `Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
+- Nilai tiap bulan:
+  - String: `paid`, `y`, `yes`, `true`, `1` → dianggap `paid`; nilai string lain → `unpaid`
+  - Number: `> 0` → dianggap `paid`; `<= 0` → `unpaid`
+- Catatan: jumlah iuran per bulan mengikuti konfigurasi sistem, nilai numerik di kolom bulan tidak dipakai ketika impor.
+
+Perilaku:
+
+- Jika Excel menandai `paid` dan belum ada data di DB → membuat record iuran, menambah cash balance, dan menulis history balance (audit).
+- Jika Excel menandai `unpaid` dan data di DB sudah ada → menghapus record iuran (beserta proof file bila ada), mengurangi cash balance, dan menulis history balance (audit).
+- Jika status sama dengan kondisi saat ini → di-skip tanpa perubahan.
+
+Contoh Curl (tanpa header cookie):
+
+```bash
+curl -X POST "http://localhost:3300/api/finance/dues/import" \
+  -F "period_year=2025" \
+  -F "file=@/path/to/membership-dues-2025.xlsx"
+```
+
+Contoh Success Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "total_rows": 3,
+      "processed_rows": 3,
+      "success_rows": 2,
+      "failed_rows": 1
+    },
+    "items": [
+      {
+        "member_id": 1,
+        "member_name": "Member 1",
+        "processed": 12,
+        "success": 2,
+        "failed": 0,
+        "errors": [],
+        "changes": [
+          { "member_id": 1, "period_year": 2025, "period_month": 1, "action": "create", "amount": 10000 },
+          { "member_id": 1, "period_year": 2025, "period_month": 2, "action": "create", "amount": 10000 },
+          { "member_id": 1, "period_year": 2025, "period_month": 3, "action": "skip", "amount": 0, "reason": "No change" }
+        ]
+      },
+      {
+        "member_id": 9999,
+        "member_name": "Invalid",
+        "processed": 12,
+        "success": 0,
+        "failed": 1,
+        "errors": ["Member not found in external service"],
+        "changes": []
+      }
+    ]
+  }
+}
+```
+
+Contoh Error Response:
+
+```json
+{
+  "success": false,
+  "errors": [
+    "Missing required columns: Member ID, Member Name, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec"
+  ]
+}
+```

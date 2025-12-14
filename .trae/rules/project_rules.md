@@ -28,6 +28,7 @@
 - jangan asal membuat file md. karena repository saya sifatnya public dan takutnya ada informasi sensitif yang di share, kecuali untuk file dokumentasi api tidak apa apa
 - isi file .env sama seperti di env.example
 - basic command test: npm run test:local
+- usahakan jangan taruh validation di file controller atau file service
 
 folder:
 - src\config: untuk semua config

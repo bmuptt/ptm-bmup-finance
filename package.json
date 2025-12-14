@@ -30,7 +30,8 @@
     "multer": "^2.0.2",
     "nodemon": "^3.1.10",
     "pg": "^8.13.0",
-    "zod": "^4.1.11"
+    "zod": "^4.1.11",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",

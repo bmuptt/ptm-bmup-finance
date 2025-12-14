@@ -110,18 +110,43 @@ class SettingMemberRepository {
     return result.data;
   }
 
+  async getMembersByIdsDirect(ids: number[], params?: { order_field?: string; order_dir?: 'asc' | 'desc'; token?: string }): Promise<SettingMember[]> {
+    if (!ids.length) return [];
+    const headers: Record<string, string> = {};
+    if (params?.token && params.token.trim()) {
+      headers['Cookie'] = `token=${params.token}`;
+      headers['Authorization'] = `Bearer ${params.token}`;
+    }
+    const query = {
+      ids: ids.join(','),
+      order_field: params?.order_field ?? 'id',
+      order_dir: params?.order_dir ?? 'desc',
+    };
+    try {
+      const response = await this.client.get<{ success?: boolean; data?: SettingMember[] } | SettingMember[]>('/setting/members/by-ids', {
+        params: query,
+        headers,
+      });
+      const body = response.data;
+      const data: SettingMember[] =
+        Array.isArray(body) ? body :
+        (body && Array.isArray(body.data) ? body.data : []);
+      return data;
+    } catch {
+      return [];
+    }
+  }
+
   async getMembersByIds(ids: number[], token?: string): Promise<SettingMember[]> {
     if (!ids.length) return [];
     
-    // Since the external API might not support fetching by IDs directly (e.g. ?ids=1,2,3),
-    // we will fetch all active members (or a large page) and filter them in memory.
-    // Ideally, the external API should support filtering by IDs.
-    // Assuming we can reuse getActiveMembers for now with a large per_page.
-    // NOTE: In a real production scenario with thousands of members, we should request an endpoint update.
-    
+    const direct = await this.getMembersByIdsDirect(ids, token ? { token } : undefined);
+    if (direct.length) {
+      return direct;
+    }
     const allMembers = await this.getActiveMembers({
       page: 1,
-      per_page: 10000, // Fetch a large number to ensure we cover the IDs
+      per_page: 10000,
       ...(token ? { token } : {}),
     });
 
